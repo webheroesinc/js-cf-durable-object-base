@@ -1,6 +1,6 @@
 {
   "name": "@whi/cf-do-base",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "publishConfig": {
     "access": "public"
   },
@@ -33,6 +33,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/webheroesinc/js-cf-durable-object-base.git"
+  },
+  "homepage": "https://webheroesinc.github.io/js-cf-durable-object-base",
+  "bugs": {
+    "url": "https://github.com/webheroesinc/js-cf-durable-object-base/issues"
   },
   "description": "Base class for Cloudflare Durable Objects with built-in routing support",
   "keywords": [
