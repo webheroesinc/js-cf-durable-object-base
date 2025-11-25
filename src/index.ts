@@ -122,7 +122,12 @@ export class BaseDurableObject<E extends Env> extends DurableObject<E> {
     ) {
         super(ctx, env);
 
-        this.router = new DurableObjectRouter(this.ctx, this.env, name ?? 'unnamed', ...(router_args ?? []));
+        this.router = new DurableObjectRouter(
+            this.ctx,
+            this.env,
+            name ?? 'unnamed',
+            ...(router_args ?? [])
+        );
     }
 
     /**
