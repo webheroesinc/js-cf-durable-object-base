@@ -1,0 +1,12 @@
+{
+  "name": "cf-do-base-test-fixtures",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@whi/cf-do-base": "file:../..",
+    "@whi/cf-routing": "^0.1.0",
+    "@whi/http-errors": "^0.1.1",
+    "itty-router": "^5.0.18",
+    "loganite": "^0.1.2"
+  }
+}
