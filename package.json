@@ -48,7 +48,7 @@
     "base-class"
   ],
   "dependencies": {
-    "@whi/cf-routing": "^0.1.1"
+    "@whi/cf-routing": "^0.2.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250708.0",
