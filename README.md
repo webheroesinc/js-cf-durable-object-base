@@ -10,6 +10,7 @@ Base class for Cloudflare Durable Objects with built-in routing support using [@
 - **Simple Inheritance** - Extend `BaseDurableObject` instead of `DurableObject`
 - **Automatic Router Setup** - Router is initialized and ready to use
 - **Class-based Route Handlers** - Organize routes using ES6 classes
+- **Context Object** - `ctx` argument with request, params, and data; `this` provides storage access
 - **Built-in Error Handling** - Automatic JSON error responses with proper status codes
 - **Type Safety** - Full TypeScript support with generic types
 - **Zero Boilerplate** - Focus on your business logic, not routing setup
@@ -26,24 +27,24 @@ npm install @whi/cf-do-base
 
 ```typescript
 import { BaseDurableObject } from '@whi/cf-do-base';
-import { DurableObjectRouteHandler } from '@whi/cf-routing';
+import { DurableObjectRouteHandler, DurableObjectContext } from '@whi/cf-routing';
 
 class CounterHandler extends DurableObjectRouteHandler {
-    async get() {
-        const count = (await this.ctx.storage.get('count')) || 0;
+    async get(ctx: DurableObjectContext) {
+        const count = (await this.storage.get('count')) || 0;
         return { count };
     }
 
-    async post() {
-        const count = ((await this.ctx.storage.get('count')) || 0) + 1;
-        await this.ctx.storage.put('count', count);
+    async post(ctx: DurableObjectContext) {
+        const count = ((await this.storage.get('count')) || 0) + 1;
+        await this.storage.put('count', count);
         return { count };
     }
 }
 
 export class Counter extends BaseDurableObject {
-    constructor(ctx, env) {
-        super(ctx, env, 'counter');
+    constructor(state, env) {
+        super(state, env, 'counter');
         this.router.defineRouteHandler('/count', CounterHandler);
     }
 }
@@ -72,9 +73,9 @@ The base class handles all the router initialization for you:
 import { BaseDurableObject } from '@whi/cf-do-base';
 
 export class MyDurableObject extends BaseDurableObject {
-    constructor(ctx, env) {
+    constructor(state, env) {
         // Name your Durable Object for better logging
-        super(ctx, env, 'my-durable-object');
+        super(state, env, 'my-durable-object');
 
         // Router is ready to use
         this.router.defineRouteHandler('/users', UserHandler);
@@ -90,41 +91,56 @@ export class MyDurableObject extends BaseDurableObject {
 Create route handlers by implementing multiple HTTP methods in a single class:
 
 ```typescript
+import { DurableObjectRouteHandler, DurableObjectContext } from '@whi/cf-routing';
+
 class DataHandler extends DurableObjectRouteHandler {
-    async get() {
-        const data = await this.ctx.storage.get('data');
+    async get(ctx: DurableObjectContext) {
+        const data = await this.storage.get('data');
         return { data };
     }
 
-    async post(request) {
-        const body = await request.json();
-        await this.ctx.storage.put('data', body.data);
+    async post(ctx: DurableObjectContext) {
+        const body = await ctx.request.json();
+        await this.storage.put('data', body.data);
         return { success: true };
     }
 
-    async delete() {
-        await this.ctx.storage.delete('data');
+    async delete(ctx: DurableObjectContext) {
+        await this.storage.delete('data');
         return { deleted: true };
     }
 }
 
 export class DataStore extends BaseDurableObject {
-    constructor(ctx, env) {
-        super(ctx, env, 'data-store');
+    constructor(state, env) {
+        super(state, env, 'data-store');
         this.router.defineRouteHandler('/data', DataHandler);
     }
 }
 ```
 
-### Custom Router Configuration
+The `ctx` object contains per-request data:
+- `ctx.request` - The incoming Request
+- `ctx.params` - Route parameters (e.g., `{ id: '123' }`)
+- `ctx.data` - Shared data for middleware communication
+- `ctx.response` - Response customization (status, headers)
+- `ctx.log` - Logger instance
 
-Pass custom configuration to the underlying itty-router:
+The handler's `this` provides Durable Object instance access:
+- `this.storage` - Durable Object storage
+- `this.id` - Durable Object ID
+- `this.state` - Raw DurableObjectState
+- `this.env` - Environment bindings
+
+### CORS Configuration
+
+Pass CORS configuration to the router:
 
 ```typescript
 export class ApiDurableObject extends BaseDurableObject {
-    constructor(ctx, env) {
+    constructor(state, env) {
         // Pass router options as the fourth parameter
-        super(ctx, env, 'api', { base: '/api/v1' });
+        super(state, env, 'api', { cors: { origins: '*' } });
 
         this.router.defineRouteHandler('/users', UserHandler);
     }
@@ -145,8 +161,8 @@ interface MyEnv extends Env {
 }
 
 export class MyDO extends BaseDurableObject<MyEnv> {
-    constructor(ctx: DurableObjectState, env: MyEnv) {
-        super(ctx, env, 'my-do');
+    constructor(state: DurableObjectState, env: MyEnv) {
+        super(state, env, 'my-do');
 
         // env is fully typed
         const apiKey = this.env.API_KEY;
@@ -156,23 +172,27 @@ export class MyDO extends BaseDurableObject<MyEnv> {
 
 ### Middleware Support
 
-Use the router's middleware capabilities:
+Use the router's middleware capabilities with the next() pattern:
 
 ```typescript
-import { HttpError } from '@whi/cf-routing';
+import { HttpError, DurableObjectMiddleware } from '@whi/cf-routing';
 
 export class SecureDO extends BaseDurableObject {
-    constructor(ctx, env) {
-        super(ctx, env, 'secure');
+    constructor(state, env) {
+        super(state, env, 'secure');
 
         // Add authentication middleware
-        this.router.all('/api/*', async (request, params) => {
-            const token = request.headers.get('Authorization');
+        // Middleware receives (ctx, state, next) - state is the DurableObjectState
+        const authMiddleware: DurableObjectMiddleware = async (ctx, state, next) => {
+            const token = ctx.request.headers.get('Authorization');
             if (!token) {
                 throw new HttpError(401, 'Unauthorized');
             }
-        });
+            ctx.data.authenticated = true;
+            return next();
+        };
 
+        this.router.use('/api/*', authMiddleware);
         this.router.defineRouteHandler('/api/data', DataHandler);
     }
 }

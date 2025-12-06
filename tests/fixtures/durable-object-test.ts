@@ -1,7 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { BaseDurableObject } from '../../lib/index.js';
-import { DurableObjectRouteHandler, HttpError } from '@whi/cf-routing';
+import { DurableObjectRouteHandler, DurableObjectContext, HttpError } from '@whi/cf-routing';
 
 export interface Env {
     LOG_LEVEL: string;
@@ -10,50 +10,50 @@ export interface Env {
 
 // Example route handler for counter
 class CounterHandler extends DurableObjectRouteHandler<Env> {
-    async get(request: Request): Promise<any> {
-        const count = (await this.ctx.storage.get<number>('count')) || 0;
+    async get(ctx: DurableObjectContext): Promise<any> {
+        const count = (await this.storage.get<number>('count')) || 0;
         return { count };
     }
 
-    async post(request: Request): Promise<any> {
-        const body = await request.json<{ increment?: number }>();
-        const currentCount = (await this.ctx.storage.get<number>('count')) || 0;
+    async post(ctx: DurableObjectContext): Promise<any> {
+        const body = await ctx.request.json<{ increment?: number }>();
+        const currentCount = (await this.storage.get<number>('count')) || 0;
         const newCount = currentCount + (body.increment || 1);
-        await this.ctx.storage.put('count', newCount);
+        await this.storage.put('count', newCount);
         return { count: newCount };
     }
 
-    async delete(request: Request): Promise<any> {
-        await this.ctx.storage.delete('count');
+    async delete(ctx: DurableObjectContext): Promise<any> {
+        await this.storage.delete('count');
         return { count: 0, reset: true };
     }
 }
 
 // Example handler with state parameters
 class StateHandler extends DurableObjectRouteHandler<Env, { key: string }> {
-    async get(request: Request, params?: { key: string }): Promise<any> {
-        if (!params?.key) {
+    async get(ctx: DurableObjectContext<{ key: string }>): Promise<any> {
+        if (!ctx.params?.key) {
             throw new HttpError(400, 'Key is required');
         }
-        const value = await this.ctx.storage.get<string>(params.key);
-        return { key: params.key, value: value || null };
+        const value = await this.storage.get<string>(ctx.params.key);
+        return { key: ctx.params.key, value: value || null };
     }
 
-    async put(request: Request, params?: { key: string }): Promise<any> {
-        if (!params?.key) {
+    async put(ctx: DurableObjectContext<{ key: string }>): Promise<any> {
+        if (!ctx.params?.key) {
             throw new HttpError(400, 'Key is required');
         }
-        const body = await request.json<{ value: string }>();
-        await this.ctx.storage.put(params.key, body.value);
-        return { key: params.key, value: body.value, stored: true };
+        const body = await ctx.request.json<{ value: string }>();
+        await this.storage.put(ctx.params.key, body.value);
+        return { key: ctx.params.key, value: body.value, stored: true };
     }
 }
 
 // Info handler
 class InfoHandler extends DurableObjectRouteHandler<Env> {
-    async get(request: Request): Promise<any> {
+    async get(ctx: DurableObjectContext): Promise<any> {
         return {
-            id: this.ctx.id.toString(),
+            id: this.id.toString(),
             name: 'Test Durable Object',
         };
     }

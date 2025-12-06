@@ -178,17 +178,17 @@ import { DurableObjectRouteHandler } from '@whi/cf-routing';
 While current test coverage validates core functionality, here are potential enhancements to better test how consumers will use this base class:
 
 ### Base Class Behavior Tests
-- Test that router_args are correctly passed through to DurableObjectRouter
+- Test that options are correctly passed through to DurableObjectRouter
 - Test inheritance patterns (multiple levels of subclassing)
 - Test that protected router property is accessible in subclasses
-- Test constructor edge cases (undefined name, empty router_args)
+- Test constructor edge cases (undefined name, undefined options)
 
 ### Durable Object Feature Compatibility
 Ensure BaseDurableObject doesn't interfere with native Durable Object features:
 - Alarm handling (setting/getting alarms while using routing)
 - WebSocket connections through the base class
-- Access to `ctx.storage` operations from route handlers
-- Access to `ctx.blockConcurrencyWhile()` and other context methods
+- Access to `this.storage` operations from route handlers
+- Access to `this.state.blockConcurrencyWhile()` and other state methods
 
 ### Real-World Scenario Tests
 Consider adding `tests/scenarios/` for common BaseDurableObject usage:

@@ -8,18 +8,18 @@
  * @example
  * ```typescript
  * import { BaseDurableObject } from '@whi/cf-do-base';
- * import { DurableObjectRouteHandler } from '@whi/cf-routing';
+ * import { DurableObjectRouteHandler, DurableObjectContext } from '@whi/cf-routing';
  *
  * class CounterHandler extends DurableObjectRouteHandler {
- *   async get() {
- *     const count = await this.ctx.storage.get('count') || 0;
+ *   async get(ctx: DurableObjectContext) {
+ *     const count = await this.storage.get('count') || 0;
  *     return { count };
  *   }
  * }
  *
  * export class Counter extends BaseDurableObject {
- *   constructor(ctx, env) {
- *     super(ctx, env, 'counter');
+ *   constructor(state, env) {
+ *     super(state, env, 'counter');
  *     this.router.defineRouteHandler('/count', CounterHandler);
  *   }
  * }
@@ -31,7 +31,7 @@
 import { DurableObject } from 'cloudflare:workers';
 
 import { DurableObjectRouter } from '@whi/cf-routing';
-import type { Router } from 'itty-router';
+import type { DurableObjectRouterOptions } from '@whi/cf-routing';
 
 /**
  * Base environment interface for Cloudflare Workers
@@ -66,30 +66,30 @@ export interface Env {
  * Basic usage with route handlers
  * ```typescript
  * import { BaseDurableObject } from '@whi/cf-do-base';
- * import { DurableObjectRouteHandler } from '@whi/cf-routing';
+ * import { DurableObjectRouteHandler, DurableObjectContext } from '@whi/cf-routing';
  *
  * class MessageHandler extends DurableObjectRouteHandler {
- *   async post(request) {
- *     const { message } = await request.json();
- *     await this.ctx.storage.put('message', message);
+ *   async post(ctx: DurableObjectContext) {
+ *     const { message } = await ctx.request.json();
+ *     await this.storage.put('message', message);
  *     return { success: true };
  *   }
  * }
  *
  * export class MessageStore extends BaseDurableObject {
- *   constructor(ctx, env) {
- *     super(ctx, env, 'message-store');
+ *   constructor(state, env) {
+ *     super(state, env, 'message-store');
  *     this.router.defineRouteHandler('/message', MessageHandler);
  *   }
  * }
  * ```
  *
  * @example
- * With custom router configuration
+ * With CORS configuration
  * ```typescript
  * export class CustomDO extends BaseDurableObject {
- *   constructor(ctx, env) {
- *     super(ctx, env, 'custom', { base: '/api' });
+ *   constructor(state, env) {
+ *     super(state, env, 'custom', { cors: { origins: '*' } });
  *     this.router.defineRouteHandler('/health', HealthHandler);
  *   }
  * }
@@ -102,32 +102,27 @@ export class BaseDurableObject<E extends Env> extends DurableObject<E> {
     /**
      * Create a new BaseDurableObject instance
      *
-     * @param ctx - Durable Object state provided by Cloudflare
+     * @param state - Durable Object state provided by Cloudflare
      * @param env - Environment bindings containing KV namespaces, secrets, etc.
      * @param name - Optional name for the router (used in logging). Defaults to 'unnamed'
-     * @param router_args - Optional arguments passed to the underlying itty-router instance
+     * @param options - Optional router options (e.g., CORS configuration)
      *
      * @example
      * ```typescript
-     * constructor(ctx, env) {
-     *   super(ctx, env, 'my-durable-object');
+     * constructor(state, env) {
+     *   super(state, env, 'my-durable-object');
      * }
      * ```
      */
     constructor(
-        ctx: DurableObjectState,
+        state: DurableObjectState,
         env: E,
         protected name?: string,
-        router_args?: Parameters<typeof Router>
+        options?: DurableObjectRouterOptions
     ) {
-        super(ctx, env);
+        super(state, env);
 
-        this.router = new DurableObjectRouter(
-            this.ctx,
-            this.env,
-            name ?? 'unnamed',
-            ...(router_args ?? [])
-        );
+        this.router = new DurableObjectRouter(this.ctx, this.env, name ?? 'unnamed', options);
     }
 
     /**
