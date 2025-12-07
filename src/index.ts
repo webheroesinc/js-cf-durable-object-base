@@ -123,6 +123,10 @@ export class BaseDurableObject<E extends Env> extends DurableObject<E> {
         super(state, env);
 
         this.router = new DurableObjectRouter(this.ctx, this.env, name ?? 'unnamed', options);
+        this.router.log.trace('Durable Object initialized', {
+            id: this.ctx.id.toString(),
+            name: name ?? 'unnamed',
+        });
     }
 
     /**
