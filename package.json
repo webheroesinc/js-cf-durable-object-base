@@ -24,8 +24,8 @@
     "test:integration": "vitest run tests/integration",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "docs": "typedoc",
     "docs:watch": "typedoc --watch"
   },

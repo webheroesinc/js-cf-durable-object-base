@@ -30,7 +30,9 @@ export async function setupDurableObject(): Promise<DurableObjectFixture> {
         modulesRoot: path.join(__dirname, '..'),
     });
 
-    const TEST_DO = (await mf.getDurableObjectNamespace('TEST_DO')) as unknown as DurableObjectNamespace;
+    const TEST_DO = (await mf.getDurableObjectNamespace(
+        'TEST_DO'
+    )) as unknown as DurableObjectNamespace;
 
     return {
         mf,
