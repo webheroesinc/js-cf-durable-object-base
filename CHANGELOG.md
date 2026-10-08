@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-08
+
 ### Changed
 
 - Requires `@whi/cf-routing` `^0.8.0` (was `^0.6.0`), which changes request
