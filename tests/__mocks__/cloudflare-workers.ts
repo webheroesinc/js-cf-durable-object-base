@@ -7,7 +7,7 @@ export class DurableObject<Env = any, Props = any> {
     protected ctx: DurableObjectState<Props>;
     protected env: Env;
 
-    constructor(ctx: DurableObjectState, env: Env) {
+    constructor(ctx: DurableObjectState<Props>, env: Env) {
         this.ctx = ctx;
         this.env = env;
     }
