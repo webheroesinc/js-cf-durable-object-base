@@ -118,7 +118,7 @@ export class BaseDurableObject<E extends Env> extends DurableObject<E> {
         state: DurableObjectState,
         env: E,
         protected name?: string,
-        options?: DurableObjectRouterOptions
+        options?: DurableObjectRouterOptions<E>
     ) {
         super(state, env);
 

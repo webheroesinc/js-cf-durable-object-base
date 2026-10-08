@@ -79,4 +79,29 @@ describe('BaseDurableObject', () => {
         expect(doInstance['router'].handle).toHaveBeenCalledWith(request);
         expect(response).toBe(mockResponse);
     });
+
+    it('should pass its env type to dynamic CORS origins', async () => {
+        interface CorsEnv extends TestEnv {
+            ALLOWED_ORIGIN: string;
+        }
+
+        const env: CorsEnv = { LOG_LEVEL: 'fatal', ALLOWED_ORIGIN: 'https://app.example.com' };
+        const doInstance = new BaseDurableObject<CorsEnv>(mockState, env, 'test', {
+            cors: {
+                // Typed env: reading a binding the base Env doesn't declare must compile
+                origins: ({ request, env }) =>
+                    request.headers.get('Origin') === env.ALLOWED_ORIGIN
+                        ? env.ALLOWED_ORIGIN
+                        : null,
+            },
+        });
+
+        const response = await doInstance.fetch(
+            new Request('https://example.com/missing', {
+                headers: { Origin: 'https://app.example.com' },
+            })
+        );
+
+        expect(response.headers.get('Access-Control-Allow-Origin')).toBe('https://app.example.com');
+    });
 });
