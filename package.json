@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "typecheck": "npm run build && tsc --noEmit -p tsconfig.typecheck.json",
     "build:test-fixture": "esbuild tests/fixtures/durable-object-test.ts --bundle --format=esm --outfile=tests/fixtures/dist/durable-object-test.js --external:node:* --external:cloudflare:*",
     "build:tests": "npm run build:test-fixture",
     "prebuild:tests": "npm run build",
@@ -26,6 +27,7 @@
     "test:coverage": "vitest run --coverage",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "check": "npm run typecheck && npm run format:check",
     "docs": "typedoc",
     "docs:watch": "typedoc --watch"
   },
