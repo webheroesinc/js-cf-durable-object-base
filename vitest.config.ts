@@ -3,7 +3,10 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
     resolve: {
         alias: {
-            'cloudflare:workers': new URL('./tests/__mocks__/cloudflare-workers.ts', import.meta.url).pathname,
+            'cloudflare:workers': new URL(
+                './tests/__mocks__/cloudflare-workers.ts',
+                import.meta.url
+            ).pathname,
         },
         extensions: ['.js', '.ts', '.json'],
         mainFields: ['module', 'main'],
@@ -14,12 +17,7 @@ export default defineConfig({
         coverage: {
             provider: 'v8',
             reporter: ['text'],
-            exclude: [
-                'node_modules/',
-                'tests/',
-                '*.config.ts',
-                '*.config.js',
-            ],
+            exclude: ['node_modules/', 'tests/', '*.config.ts', '*.config.js'],
             include: ['src/**/*.ts', 'lib/**/*.js'],
             thresholds: {
                 lines: 80,

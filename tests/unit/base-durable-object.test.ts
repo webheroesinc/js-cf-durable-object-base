@@ -6,30 +6,31 @@ interface TestEnv {
 }
 
 // Mock DurableObjectState
-const createMockState = (): DurableObjectState => ({
-    id: {
-        toString: () => 'test-id',
-        equals: () => false,
-        name: 'test-name',
-    } as DurableObjectId,
-    storage: {
-        get: vi.fn(),
-        put: vi.fn(),
-        delete: vi.fn(),
-        deleteAll: vi.fn(),
-        list: vi.fn(),
-        getAlarm: vi.fn(),
-        setAlarm: vi.fn(),
-        deleteAlarm: vi.fn(),
-        sync: vi.fn(),
-        transaction: vi.fn(),
-        transactionSync: vi.fn(),
-        getSql: vi.fn(),
-    } as any,
-    blockConcurrencyWhile: vi.fn(async (callback: () => Promise<void>) => callback()),
-    waitUntil: vi.fn(),
-    abort: vi.fn(),
-});
+const createMockState = (): DurableObjectState =>
+    ({
+        id: {
+            toString: () => 'test-id',
+            equals: () => false,
+            name: 'test-name',
+        } as DurableObjectId,
+        storage: {
+            get: vi.fn(),
+            put: vi.fn(),
+            delete: vi.fn(),
+            deleteAll: vi.fn(),
+            list: vi.fn(),
+            getAlarm: vi.fn(),
+            setAlarm: vi.fn(),
+            deleteAlarm: vi.fn(),
+            sync: vi.fn(),
+            transaction: vi.fn(),
+            transactionSync: vi.fn(),
+            getSql: vi.fn(),
+        } as any,
+        blockConcurrencyWhile: vi.fn(async (callback: () => Promise<void>) => callback()),
+        waitUntil: vi.fn(),
+        abort: vi.fn(),
+    }) as unknown as DurableObjectState;
 
 describe('BaseDurableObject', () => {
     let mockState: DurableObjectState;
