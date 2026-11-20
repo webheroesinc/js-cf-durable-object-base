@@ -202,7 +202,7 @@ export class SecureDO extends BaseDurableObject {
 
 **https://webheroesinc.github.io/js-cf-durable-object-base/**
 
-API documentation is automatically generated from source code using TypeDoc and deployed on every push to master.
+API documentation is automatically generated from source code using TypeDoc and redeployed with each release, when it is merged to `master`.
 
 To generate locally:
 
