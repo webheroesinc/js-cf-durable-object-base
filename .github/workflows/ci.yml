@@ -16,10 +16,10 @@ jobs:
     format:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v7
 
             - name: Setup Node.js
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@v7
               with:
                   node-version-file: .nvmrc
                   cache: 'npm'
@@ -33,10 +33,10 @@ jobs:
     typecheck:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v7
 
             - name: Setup Node.js
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@v7
               with:
                   node-version-file: .nvmrc
                   cache: 'npm'
@@ -56,12 +56,12 @@ jobs:
         runs-on: ubuntu-latest
         if: github.base_ref == 'master'
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v7
               with:
                   fetch-depth: 0 # need tags to check whether this version is already released
 
             - name: Setup Node.js
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@v7
               with:
                   node-version-file: .nvmrc
 
@@ -80,10 +80,10 @@ jobs:
         needs: [format, typecheck, version-check]
         if: ${{ !failure() && !cancelled() }}
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v7
 
             - name: Setup Node.js
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@v7
               with:
                   node-version-file: .nvmrc
                   cache: 'npm'
