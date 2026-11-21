@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-21
+
 ### Changed
 
 - `@whi/cf-routing` is updated to 0.9.0. Cookies a handler or middleware sets
