@@ -1,6 +1,6 @@
 {
   "name": "@whi/cf-do-base",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "publishConfig": {
     "access": "public"
   },
@@ -51,18 +51,18 @@
     "base-class"
   ],
   "dependencies": {
-    "@whi/cf-routing": "^0.8.0"
+    "@whi/cf-routing": "^0.9.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250708.0",
-    "@vitest/coverage-v8": "^2.1.8",
-    "esbuild": "^0.24.2",
+    "@cloudflare/workers-types": "^5.20261120.1",
+    "@vitest/coverage-v8": "^5.1.1",
+    "esbuild": "^0.28.2",
     "itty-router": "^5.0.18",
-    "miniflare": "^3.20241218.1",
+    "miniflare": "^4.20260730.0",
     "prettier": "^3.6.2",
     "typedoc": "^0.28.14",
-    "typescript": "^5.8.3",
-    "vitest": "^2.1.8",
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.1",
     "wrangler": "^4.50.0"
   }
 }

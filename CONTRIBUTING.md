@@ -233,6 +233,14 @@ and they must pass to merge. A release is a pull request from `develop` to
 publish workflow creates the tag, and a tag made locally would make it skip
 the release.
 
+To merge `develop` into `master` without releasing, for example to get
+tooling or Dependabot config changes onto `master` (Dependabot reads its
+config from there), add the `release:none` label to the PR instead of
+bumping. CI then requires the version to be unchanged from `master` and
+already tagged, so the merge stages nothing on npm. Adding or removing the
+label doesn't start a new CI run; if you change it after the checks have run,
+re-run the `version-check` job.
+
 Merging to `master` runs `.github/workflows/publish.yml`, which stages the
 release on npm with trusted publishing, tags it and redeploys the docs.
 Nothing is live until a maintainer approves the staged release with 2FA
@@ -249,6 +257,18 @@ under the `next` dist-tag. Record each release in `CHANGELOG.md`.
 6. Add an entry under `[Unreleased]` in `CHANGELOG.md` for user-visible changes
 7. Commit with clear messages
 8. Submit a pull request to `develop`
+
+## Reviewing Pull Requests
+
+Post every review as a comment on the pull request: the findings, each with
+enough reasoning that someone reading it later understands why it matters.
+Commits made in response then have their reasons next to the code instead of
+in a private conversation.
+
+Once the findings are dealt with, reply with a separate comment recording what
+happened to each: fixed (with the commit), filed (with the issue number), or
+left as is (with the reason). Leave the review comment itself unedited, so it
+stays a record of what was found.
 
 ## Questions?
 

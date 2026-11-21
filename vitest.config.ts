@@ -18,7 +18,7 @@ export default defineConfig({
             provider: 'v8',
             reporter: ['text'],
             exclude: ['node_modules/', 'tests/', '*.config.ts', '*.config.js'],
-            include: ['src/**/*.ts', 'lib/**/*.js'],
+            include: ['src/**/*.ts'],
             thresholds: {
                 lines: 80,
                 functions: 80,
