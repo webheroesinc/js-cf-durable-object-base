@@ -14,6 +14,6 @@ node_modules: package.json
 	touch $@
 
 # Build test fixture
-tests/fixtures/dist/durable-object-test.js: $(TEST_FIXTURES) lib/index.js tests/fixtures/package.json
+tests/fixtures/dist/durable-object-test.js: $(TEST_FIXTURES) lib/index.js
 	npm run build:test-fixture
 	touch $@
